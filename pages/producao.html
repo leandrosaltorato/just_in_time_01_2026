@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestão de Produção - Just in Time</title>
+    <link rel="stylesheet" href="../styles/style.css" />
+  </head>
+
+  <body>
+    <header class="navbar">
+      <h1>Just in Time</h1>
+
+      <nav>
+        <a href="produto.html">Produtos</a>
+        <a href="producao.html" class="ativo">Produção</a>
+      </nav>
+
+      <div class="usuario">
+        <span id="nomeUsuario">Usuário</span>
+        <button id="btnSair">Sair</button>
+      </div>
+    </header>
+
+    <main class="producao">
+      <h2>Gestão de Produção</h2>
+
+      <section>
+        <h3>Registrar Movimentação</h3>
+
+        <form id="formProducao">
+          <label for="produto">Produto</label>
+
+          <select id="produto" required>
+            <option value="">Selecione um produto</option>
+          </select>
+
+          <label for="tipo">Tipo de movimentação</label>
+
+          <select id="tipo" required>
+            <option value="">Selecione</option>
+            <option value="fabricado">Fabricado</option>
+            <option value="pedido">Pedido</option>
+          </select>
+
+          <label for="quantidade">Quantidade</label>
+
+          <input
+            type="number"
+            id="quantidade"
+            min="1"
+            required
+            placeholder="Quantidade"
+          />
+
+          <label for="data">Data da movimentação</label>
+
+          <input type="date" id="data" required />
+
+          <button type="submit">Registrar</button>
+        </form>
+
+        <p id="mensagem"></p>
+      </section>
+
+      <section>
+        <h3>Produtos em estoque</h3>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Produto</th>
+              <th>Estoque atual</th>
+              <th>Estoque mínimo</th>
+            </tr>
+          </thead>
+
+          <tbody id="listaProdutos"></tbody>
+        </table>
+      </section>
+    </main>
+
+    <script src="../scripts/producao.js"></script>
+  </body>
+</html>

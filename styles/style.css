@@ -1,0 +1,390 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f3f5f4;
+  color: #333;
+}
+
+.navbar {
+  width: 100%;
+  min-height: 72px;
+  padding: 0 40px;
+  background-color: #1f4d3a;
+  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.navbar h1 {
+  font-size: 26px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.navbar nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.navbar nav a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 10px 22px;
+
+  color: white;
+  text-decoration: none;
+
+  font-size: 15px;
+  font-weight: bold;
+
+  border-radius: 14px;
+
+  transition: all 0.2s ease;
+}
+
+.navbar nav a:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+.navbar nav a.ativo {
+  background-color: #3b8f68;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.navbar nav a.ativo:hover {
+  background-color: #46a174;
+}
+
+.navbar .usuario {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+#nomeUsuario {
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+button {
+  border: none;
+  border-radius: 7px;
+
+  padding: 11px 18px;
+
+  font-size: 15px;
+  font-weight: bold;
+
+  cursor: pointer;
+
+  color: white;
+  background-color: #2f7d5a;
+
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: #256346;
+}
+
+#btnSair {
+  margin: 0;
+  padding: 9px 17px;
+  background-color: #c0392b;
+}
+
+#btnSair:hover {
+  background-color: #962d22;
+}
+
+#btnCancelar,
+#btnLimpar {
+  background-color: #777;
+}
+
+#btnCancelar:hover,
+#btnLimpar:hover {
+  background-color: #555;
+}
+
+#btnBuscar {
+  margin-left: 5px;
+}
+
+main {
+  width: 90%;
+  max-width: 1100px;
+
+  margin: 40px auto;
+  padding: 35px;
+
+  background-color: white;
+
+  border-radius: 12px;
+
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
+}
+
+main h2 {
+  color: #1f4d3a;
+  font-size: 25px;
+  margin-bottom: 30px;
+}
+
+section {
+  margin-bottom: 35px;
+}
+
+section h3 {
+  color: #1f4d3a;
+  font-size: 19px;
+  margin-bottom: 18px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+label {
+  font-weight: bold;
+  margin-top: 8px;
+  color: #444;
+}
+
+input,
+select {
+  width: 100%;
+
+  padding: 12px;
+
+  border: 1px solid #ccc;
+  border-radius: 7px;
+
+  background-color: white;
+
+  color: #333;
+
+  font-size: 15px;
+
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #2f7d5a;
+  box-shadow: 0 0 0 2px rgba(47, 125, 90, 0.12);
+}
+
+#mensagem {
+  margin-top: 15px;
+  text-align: center;
+  font-weight: bold;
+}
+
+table {
+  width: 100%;
+
+  margin-top: 15px;
+
+  border-collapse: separate;
+  border-spacing: 0;
+
+  overflow: hidden;
+
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+th,
+td {
+  padding: 13px;
+
+  border-bottom: 1px solid #ddd;
+
+  text-align: left;
+}
+
+th {
+  background-color: #1f4d3a;
+  color: white;
+  font-weight: bold;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:nth-child(even) {
+  background-color: #f8f9f8;
+}
+
+tr:hover {
+  background-color: #eef4f0;
+}
+
+td button {
+  margin: 2px;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+.produto,
+.producao {
+  overflow-x: auto;
+}
+
+.login {
+  width: 400px;
+
+  margin: 100px auto;
+  padding: 40px;
+
+  background-color: white;
+
+  border-radius: 12px;
+
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
+}
+
+.login h1,
+.login h2 {
+  text-align: center;
+}
+
+.login h1 {
+  color: #1f4d3a;
+  margin-bottom: 10px;
+}
+
+.login h2 {
+  margin-bottom: 30px;
+}
+
+.login form {
+  display: flex;
+  flex-direction: column;
+}
+
+.login form label {
+  margin-bottom: 8px;
+}
+
+.login form input {
+  margin-bottom: 15px;
+}
+
+@media (max-width: 800px) {
+  .navbar {
+    padding: 12px 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .navbar h1 {
+    font-size: 22px;
+  }
+
+  .navbar nav {
+    order: 3;
+    width: 100%;
+    padding-bottom: 5px;
+  }
+
+  .navbar nav a {
+    padding: 9px 18px;
+  }
+
+  .navbar .usuario {
+    gap: 8px;
+  }
+
+  #nomeUsuario {
+    font-size: 13px;
+  }
+
+  #btnSair {
+    padding: 8px 13px;
+  }
+
+  main {
+    width: 94%;
+    margin: 25px auto;
+    padding: 22px;
+  }
+
+  main h2 {
+    font-size: 22px;
+  }
+
+  table {
+    font-size: 13px;
+  }
+
+  th,
+  td {
+    padding: 9px;
+  }
+
+  .login {
+    width: 94%;
+    margin: 50px auto;
+    padding: 25px;
+  }
+}
+
+@media (max-width: 500px) {
+  .navbar {
+    justify-content: center;
+  }
+
+  .navbar h1 {
+    width: 100%;
+    text-align: center;
+  }
+
+  .navbar .usuario {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .navbar nav {
+    order: 0;
+  }
+
+  .navbar nav a {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+
+  main {
+    width: 96%;
+    padding: 18px;
+  }
+
+  table {
+    min-width: 600px;
+  }
+
+  .produto,
+  .producao {
+    overflow-x: auto;
+  }
+}
