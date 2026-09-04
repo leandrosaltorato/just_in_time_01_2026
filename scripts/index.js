@@ -30,7 +30,7 @@ formLogin.addEventListener("submit", async (event) => {
     localStorage.setItem("token", dados.token);
     localStorage.setItem("usuario", JSON.stringify(dados.usuario));
 
-    window.location.href = "../pages/producao.html";
+    window.location.href = "../pages/principal.html";
   } catch (erro) {
     mensagem.textContent = "Erro ao conectar com o servidor.";
     mensagem.style.color = "red";

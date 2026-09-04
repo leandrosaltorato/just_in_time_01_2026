@@ -388,3 +388,82 @@ td button {
     overflow-x: auto;
   }
 }
+
+.painel {
+  width: 90%;
+  max-width: 900px;
+  margin: 50px auto;
+  padding: 40px;
+
+  background-color: white;
+
+  border-radius: 12px;
+
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
+}
+
+.painel h2 {
+  color: #1f4d3a;
+  font-size: 25px;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.descricao {
+  text-align: center;
+  color: #777;
+  font-size: 15px;
+  margin-bottom: 35px;
+}
+
+.opcoes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.opcao {
+  padding: 30px;
+
+  background-color: #f8f9f8;
+
+  border: 1px solid #ddd;
+  border-radius: 8px;
+
+  text-decoration: none;
+
+  transition: all 0.2s ease;
+}
+
+.opcao:hover {
+  background-color: #eef4f0;
+  border-color: #2f7d5a;
+
+  transform: translateY(-3px);
+
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.opcao h3 {
+  color: #1f4d3a;
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.opcao p {
+  color: #666;
+  font-size: 14px;
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  .painel {
+    width: 94%;
+    margin: 30px auto;
+    padding: 25px 20px;
+  }
+
+  .opcoes {
+    grid-template-columns: 1fr;
+  }
+}
