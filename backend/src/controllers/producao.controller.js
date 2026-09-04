@@ -12,11 +12,13 @@ const cadastrar = async (req, res) => {
 
     if (tipo !== "fabricado" && tipo !== "pedido") {
       return res.status(400).json({
-        erro: "tipo de movimentação invalido",
+        erro: "tipo de movimentação inválido",
       });
     }
 
-    if (Number(quantidade) <= 0 || !Number.isInteger(Number(quantidade))) {
+    const quantidadeNumero = Number(quantidade);
+
+    if (quantidadeNumero <= 0 || !Number.isInteger(quantidadeNumero)) {
       return res.status(400).json({
         erro: "a quantidade deve ser um número inteiro maior que zero",
       });
@@ -42,24 +44,40 @@ const cadastrar = async (req, res) => {
 
     if (!usuario) {
       return res.status(404).json({
-        erro: "usuário nao encontrado",
+        erro: "usuário não encontrado",
       });
     }
 
     let novaQuantidade = produto.quantidadeEstoque;
 
+    // FABRICADO aumenta o estoque
     if (tipo === "fabricado") {
-      novaQuantidade += Number(quantidade);
+      novaQuantidade = produto.quantidadeEstoque + quantidadeNumero;
     }
 
+    // PEDIDO diminui o estoque
     if (tipo === "pedido") {
-      if (Number(quantidade) > produto.quantidadeEstoque) {
+      // Primeiro verifica se existe estoque suficiente
+      if (quantidadeNumero > produto.quantidadeEstoque) {
         return res.status(400).json({
           erro: "estoque insuficiente",
+          estoqueAtual: produto.quantidadeEstoque,
+          quantidadeSolicitada: quantidadeNumero,
         });
       }
 
-      novaQuantidade -= Number(quantidade);
+      novaQuantidade = produto.quantidadeEstoque - quantidadeNumero;
+
+      // Impede que o pedido deixe o estoque abaixo do mínimo
+      if (novaQuantidade < produto.estoqueMinimo) {
+        return res.status(400).json({
+          erro: "pedido não permitido: o estoque ficará abaixo do mínimo",
+          estoqueAtual: produto.quantidadeEstoque,
+          estoqueMinimo: produto.estoqueMinimo,
+          quantidadeSolicitada: quantidadeNumero,
+          estoqueAposPedido: novaQuantidade,
+        });
+      }
     }
 
     const resultado = await prisma.$transaction(async (tx) => {
@@ -75,7 +93,7 @@ const cadastrar = async (req, res) => {
       const producao = await tx.producao.create({
         data: {
           tipo,
-          quantidade: Number(quantidade),
+          quantidade: quantidadeNumero,
           data: new Date(data),
           produtoId: Number(produtoId),
           usuarioId: Number(usuarioId),
@@ -93,7 +111,7 @@ const cadastrar = async (req, res) => {
     return res.status(201).json({
       mensagem: "movimentação registrada com sucesso.",
       ...resultado,
-      alerta: estoqueBaixo ? "atenção: estoque abaixo do minimo" : null,
+      alerta: estoqueBaixo ? "atenção: estoque abaixo do mínimo" : null,
     });
   } catch (erro) {
     console.error(erro);
@@ -173,7 +191,9 @@ const atualizar = async (req, res) => {
       });
     }
 
-    if (Number(quantidade) <= 0 || !Number.isInteger(Number(quantidade))) {
+    const quantidadeNova = Number(quantidade);
+
+    if (quantidadeNova <= 0 || !Number.isInteger(quantidadeNova)) {
       return res.status(400).json({
         erro: "a quantidade deve ser um número inteiro maior que zero",
       });
@@ -191,18 +211,96 @@ const atualizar = async (req, res) => {
       });
     }
 
-    const atualizada = await prisma.producao.update({
+    const produto = await prisma.produto.findUnique({
       where: {
-        id: Number(id),
-      },
-      data: {
-        tipo,
-        quantidade: Number(quantidade),
-        data: new Date(data),
+        id: item.produtoId,
       },
     });
 
-    return res.status(200).json(atualizada);
+    if (!produto) {
+      return res.status(404).json({
+        erro: "produto não encontrado",
+      });
+    }
+
+    /*
+     * Primeiro desfaz o efeito da movimentação antiga.
+     *
+     * fabricado antigo -> remove do estoque
+     * pedido antigo    -> devolve ao estoque
+     */
+    let estoqueBase = produto.quantidadeEstoque;
+
+    if (item.tipo === "fabricado") {
+      estoqueBase -= item.quantidade;
+    }
+
+    if (item.tipo === "pedido") {
+      estoqueBase += item.quantidade;
+    }
+
+    /*
+     * Agora aplica a nova movimentação.
+     */
+    let novoEstoque = estoqueBase;
+
+    if (tipo === "fabricado") {
+      novoEstoque += quantidadeNova;
+    }
+
+    if (tipo === "pedido") {
+      if (quantidadeNova > estoqueBase) {
+        return res.status(400).json({
+          erro: "estoque insuficiente para atualizar o pedido",
+          estoqueDisponivel: estoqueBase,
+          quantidadeSolicitada: quantidadeNova,
+        });
+      }
+
+      novoEstoque = estoqueBase - quantidadeNova;
+
+      if (novoEstoque < produto.estoqueMinimo) {
+        return res.status(400).json({
+          erro: "alteração não permitida: o estoque ficará abaixo do mínimo",
+          estoqueAtual: produto.quantidadeEstoque,
+          estoqueMinimo: produto.estoqueMinimo,
+          quantidadeSolicitada: quantidadeNova,
+          estoqueAposAlteracao: novoEstoque,
+        });
+      }
+    }
+
+    const resultado = await prisma.$transaction(async (tx) => {
+      const produtoAtualizado = await tx.produto.update({
+        where: {
+          id: produto.id,
+        },
+        data: {
+          quantidadeEstoque: novoEstoque,
+        },
+      });
+
+      const movimentacaoAtualizada = await tx.producao.update({
+        where: {
+          id: Number(id),
+        },
+        data: {
+          tipo,
+          quantidade: quantidadeNova,
+          data: new Date(data),
+        },
+      });
+
+      return {
+        producao: movimentacaoAtualizada,
+        produto: produtoAtualizado,
+      };
+    });
+
+    return res.status(200).json({
+      mensagem: "movimentação atualizada com sucesso",
+      ...resultado,
+    });
   } catch (erro) {
     console.error(erro);
 
@@ -224,24 +322,72 @@ const excluir = async (req, res) => {
 
     if (!item) {
       return res.status(404).json({
-        erro: "Movimentação não encontrada.",
+        erro: "movimentação não encontrada",
       });
     }
 
-    await prisma.producao.delete({
+    const produto = await prisma.produto.findUnique({
       where: {
-        id: Number(id),
+        id: item.produtoId,
       },
     });
 
+    if (!produto) {
+      return res.status(404).json({
+        erro: "produto não encontrado",
+      });
+    }
+
+    /*
+     * Ao excluir:
+     *
+     * fabricado -> remove a quantidade que havia sido adicionada
+     * pedido    -> devolve a quantidade que havia sido retirada
+     */
+    let novoEstoque = produto.quantidadeEstoque;
+
+    if (item.tipo === "fabricado") {
+      novoEstoque -= item.quantidade;
+    }
+
+    if (item.tipo === "pedido") {
+      novoEstoque += item.quantidade;
+    }
+
+    if (novoEstoque < 0) {
+      return res.status(400).json({
+        erro: "não é possível excluir esta movimentação pois o estoque ficaria negativo",
+      });
+    }
+
+    const resultado = await prisma.$transaction(async (tx) => {
+      await tx.producao.delete({
+        where: {
+          id: Number(id),
+        },
+      });
+
+      const produtoAtualizado = await tx.produto.update({
+        where: {
+          id: produto.id,
+        },
+        data: {
+          quantidadeEstoque: novoEstoque,
+        },
+      });
+
+      return produtoAtualizado;
+    });
+
     return res.status(200).json({
-      mensagem: "movimentação excluida com sucesso",
+      mensagem: "movimentação excluída com sucesso",
+      produto: resultado,
     });
   } catch (erro) {
     console.error(erro);
 
     return res.status(500).json({
-      erro: "Erro ao excluir movimentação.",
+      erro: "erro ao excluir movimentação",
     });
   }
 };
